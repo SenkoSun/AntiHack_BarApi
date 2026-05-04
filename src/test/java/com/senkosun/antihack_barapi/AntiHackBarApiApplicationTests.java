@@ -2,21 +2,26 @@ package com.senkosun.antihack_barapi;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class AntiHackBarApplicationTests {
     @Autowired
     private MockMvc mockMvc;
-    private static String VALID_TOKEN
+    private static String VALID_TOKEN;
 
     @Test
     @Order(1)
@@ -27,8 +32,12 @@ class AntiHackBarApplicationTests {
 
                 .andExpect(jsonPath("$.status").value("ok"))
                 .andExpect(jsonPath("$.id").value(startsWith("BAR-")))
-                .andExpect(jsonPath("$.token").exists());
-        VALID_TOKEN = result.getResponse().getContentAsString().readTree(responseBody).get("token").asText();
+                .andExpect(jsonPath("$.token").exists())
+                .andReturn();
+        String responseBody = result.getResponse().getContentAsString();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(responseBody);
+        VALID_TOKEN = jsonNode.get("token").asText();
     }
 
     @Test
@@ -50,28 +59,14 @@ class AntiHackBarApplicationTests {
     void testGetMenu() throws Exception {
 
         mockMvc.perform(get("/menu")
-                // Заголовок авторизации
-                .header("Authorization", "Bearer " + VALID_TOKEN)
-                // Заголовок с временем (формат HH:MM)
-                .header("X-Time", "14:30")
-
-                // Проверяем статус
+                        .header("Authorization", "Bearer " + VALID_TOKEN)
+                        .header("X-Time", "14:30"))
                 .andExpect(status().isOk())
-
-                // Проверяем поле status
                 .andExpect(jsonPath("$.status").value("ok"))
-
-                // Проверяем что drinks - это массив
                 .andExpect(jsonPath("$.drinks").isArray())
-
-                // Проверяем что в массиве есть хотя бы один элемент
                 .andExpect(jsonPath("$.drinks.length()").exists())
-
-                // Проверяем balance
                 .andExpect(jsonPath("$.balance").exists())
                 .andExpect(jsonPath("$.balance").isNumber())
-
-                // Проверяем mood_level
                 .andExpect(jsonPath("$.mood_level").exists())
                 .andExpect(jsonPath("$.mood_level").isString());
     }
