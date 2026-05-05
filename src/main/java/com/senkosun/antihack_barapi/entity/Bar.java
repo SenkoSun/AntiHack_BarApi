@@ -1,5 +1,6 @@
 package com.senkosun.antihack_barapi.entity;
 
+import com.senkosun.antihack_barapi.enums.Mood;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,7 @@ public class Bar {
 
     @Column(name = "mood_level", nullable = false)
     @Builder.Default
-    private String moodLevel = "friendly";
+    private String moodLevel = Mood.NORMAL.getDisplayName();
 
     @Column(name = "bar_closed", nullable = false)
     @Builder.Default

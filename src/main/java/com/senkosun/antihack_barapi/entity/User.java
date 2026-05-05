@@ -1,5 +1,6 @@
 package com.senkosun.antihack_barapi.entity;
 
+import com.senkosun.antihack_barapi.enums.Rank;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +27,7 @@ public class User {
 
     @Column(nullable = false)
     @Builder.Default
-    private String rank = "Новичок";
+    private String rank = Rank.BEGINNER.getDisplayName();
 
 
     public boolean deductBalance(int amount) {
