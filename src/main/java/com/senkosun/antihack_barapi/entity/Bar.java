@@ -17,7 +17,7 @@ public class Bar {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Integer id;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)

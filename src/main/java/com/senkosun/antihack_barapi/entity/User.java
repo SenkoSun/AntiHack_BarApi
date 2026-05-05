@@ -16,9 +16,9 @@ import lombok.NoArgsConstructor;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Integer id;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, unique = true, length = 32)
     private String token;
 
     @Column(nullable = false)
@@ -27,7 +27,7 @@ public class User {
 
     @Column(nullable = false)
     @Builder.Default
-    private String rank = Rank.BEGINNER.getDisplayName();
+    private String rang = Rank.BEGINNER.getDisplayName();
 
 
     public boolean deductBalance(int amount) {
