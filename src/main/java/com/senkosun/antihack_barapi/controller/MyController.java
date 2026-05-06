@@ -4,17 +4,21 @@ package com.senkosun.antihack_barapi.controller;
 //import com.senkosun.antihack_barapi.service.UserService;
 //import com.senkosun.antihack_barapi.service.HistoryService;
 
+import com.senkosun.antihack_barapi.dto.responce.RegisterResponse;
+import com.senkosun.antihack_barapi.entity.User;
+import com.senkosun.antihack_barapi.service.AuthService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
+@Slf4j
 @RestController
-@RequestMapping("/")
+@RequiredArgsConstructor
 public class MyController {
 
-//    @Autowired
-//    private AuthService authService;
-//
+    private final AuthService authService;
+
 //    @Autowired
 //    private BarService barService;
 //
@@ -24,11 +28,16 @@ public class MyController {
 //    @Autowired
 //    private HistoryService historyService;
 
-    // Регистрация
-//    @PostMapping("/register")
-//    public RegisterResponse register(@RequestBody RegisterRequest request) {
-//        return authService.register(request);
-//    }
+//     Регистрация
+    @PostMapping("/register")
+    public RegisterResponse register() {
+        User user = authService.registerUser();
+        return RegisterResponse.builder()
+                .status("ok")
+                .id("BAR-" + user.getId())
+                .token(user.getToken())
+                .build();
+    }
 
     // Сброс
 //    @PostMapping("/reset")
