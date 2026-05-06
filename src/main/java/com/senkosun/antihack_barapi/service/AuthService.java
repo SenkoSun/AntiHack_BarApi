@@ -5,7 +5,9 @@ import java.util.Optional;
 public interface AuthService {
     User registerUser();
 
-    User resetUser(User user);
+    void resetUser(User user);
+
+    User getAuthenticatedUser(String authHeader);
 
     String generateToken();
 

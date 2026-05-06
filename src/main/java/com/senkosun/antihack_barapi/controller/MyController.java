@@ -1,15 +1,17 @@
 package com.senkosun.antihack_barapi.controller;
-//import com.senkosun.antihack_barapi.service.AuthService;
+import com.senkosun.antihack_barapi.service.*;
 //import com.senkosun.antihack_barapi.service.BarService;
-//import com.senkosun.antihack_barapi.service.UserService;
 //import com.senkosun.antihack_barapi.service.HistoryService;
 
-import com.senkosun.antihack_barapi.dto.responce.RegisterResponse;
+import com.senkosun.antihack_barapi.dto.response.*;
 import com.senkosun.antihack_barapi.entity.User;
-import com.senkosun.antihack_barapi.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+//import java.util.Map;
 
 
 @Slf4j
@@ -19,13 +21,10 @@ public class MyController {
 
     private final AuthService authService;
 
-//    @Autowired
 //    private BarService barService;
 //
-//    @Autowired
-//    private UserService userService;
+//    private final UserService userService;
 //
-//    @Autowired
 //    private HistoryService historyService;
 
 //     Регистрация
@@ -39,11 +38,25 @@ public class MyController {
                 .build();
     }
 
-    // Сброс
-//    @PostMapping("/reset")
-//    public ResetResponse reset(@RequestHeader("Authorization") String auth) {
-//        return userService.reset(auth);
-//    }
+//     Сброс
+@PostMapping("/reset")
+public ResetResponse reset(
+        @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+    // 1. Получаем пользователя по токену из заголовка
+    User user = authService.getAuthenticatedUser(authHeader);
+
+    // 2. Проверяем авторизацию
+    if (user == null) {
+        return ResetResponse.builder().status("error").build();
+    }
+
+    // 3. Вызываем сброс
+    authService.resetUser(user);
+
+    // 4. Возвращаем ответ
+    return ResetResponse.builder().status("ok").build();
+}
 
     // Меню
 //    @GetMapping("/menu")

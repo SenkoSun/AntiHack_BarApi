@@ -50,11 +50,11 @@ public class AuthServiceImpl implements AuthService{
 
     @Transactional
     @Override
-    public User resetUser(User user) {
+    public void resetUser(User user) {
 
         user.setBalance(100);
         user.setRang(Rank.BEGINNER.getDisplayName());
-        User resetUser = userRepository.save(user);
+        userRepository.save(user);
 
         Bar bar = barRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Бар не найден для пользователя id=" + user.getId()));
@@ -68,8 +68,20 @@ public class AuthServiceImpl implements AuthService{
 
         log.info("Пользователь {} сбросил аккаунт", user.getId());
 
-        return user;
+    }
 
+    @Override
+    public User getAuthenticatedUser(String authHeader) {
+        // Проверяем, что заголовок есть и начинается с "Bearer "
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+
+        // Извлекаем токен (убираем "Bearer ")
+        String token = authHeader.substring(7);
+
+        // Ищем пользователя по токену
+        return userRepository.findByToken(token).orElse(null);
     }
 
     @Override

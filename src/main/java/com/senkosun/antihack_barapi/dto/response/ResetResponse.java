@@ -1,4 +1,4 @@
-package com.senkosun.antihack_barapi.dto.responce;
+package com.senkosun.antihack_barapi.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterResponse {
+public class ResetResponse {
     private String status;
-    private String id;
-    private String token;
 }
