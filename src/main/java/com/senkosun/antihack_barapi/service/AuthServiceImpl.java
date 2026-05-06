@@ -1,6 +1,10 @@
 package com.senkosun.antihack_barapi.service;
 
+import com.senkosun.antihack_barapi.entity.Bar;
 import com.senkosun.antihack_barapi.entity.User;
+import com.senkosun.antihack_barapi.enums.Mood;
+import com.senkosun.antihack_barapi.enums.Rank;
+import com.senkosun.antihack_barapi.repository.BarRepository;
 import com.senkosun.antihack_barapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,17 +20,56 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
+    private final BarRepository barRepository;
 
     @Transactional
     @Override
     public User registerUser() {
-        String token = generateToken();
-        User user = User.builder().token(token).build();
 
+        String token = generateToken();
+        User user = User
+                .builder()
+                .token(token)
+                .build();
         userRepository.save(user);
+
+        Bar bar = Bar.builder()
+                .user(user)
+                .moodLevel(Mood.NORMAL.getDisplayName())
+                .barClosed(false)
+                .totalOrders(0)
+                .uniqueDrinksCount(0)
+                .favoriteDrink(null)
+                .build();
+        barRepository.save(bar);
+
         log.info("Новый пользователь зарегистрирован: id={}, token={}",
                 user.getId(), user.getToken());
         return user;
+    }
+
+    @Transactional
+    @Override
+    public User resetUser(User user) {
+
+        user.setBalance(100);
+        user.setRang(Rank.BEGINNER.getDisplayName());
+        User resetUser = userRepository.save(user);
+
+        Bar bar = barRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Бар не найден для пользователя id=" + user.getId()));
+
+        bar.setMoodLevel(Mood.NORMAL.getDisplayName());
+        bar.setBarClosed(false);
+        bar.setTotalOrders(0);
+        bar.setUniqueDrinksCount(0);
+        bar.setFavoriteDrink(null);
+        barRepository.save(bar);
+
+        log.info("Пользователь {} сбросил аккаунт", user.getId());
+
+        return user;
+
     }
 
     @Override

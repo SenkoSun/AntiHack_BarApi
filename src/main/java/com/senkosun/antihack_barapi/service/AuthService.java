@@ -5,6 +5,8 @@ import java.util.Optional;
 public interface AuthService {
     User registerUser();
 
+    User resetUser(User user);
+
     String generateToken();
 
     Optional<User> findByToken(String token);
