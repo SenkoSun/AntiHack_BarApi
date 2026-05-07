@@ -1,5 +1,5 @@
 package com.senkosun.antihack_barapi.controller;
-import com.senkosun.antihack_barapi.enums.Mood;
+import com.senkosun.antihack_barapi.entity.Bar;
 import com.senkosun.antihack_barapi.service.*;
 //import com.senkosun.antihack_barapi.service.BarService;
 //import com.senkosun.antihack_barapi.service.HistoryService;
@@ -42,10 +42,10 @@ public class MyController {
     //     Сброс
     @PostMapping("/reset")
     public ResetResponse reset(
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+            @RequestHeader(value = "Authorization", required = false) String auth) {
 
         // 1. Получаем пользователя по токену из заголовка
-        User user = authService.getAuthenticatedUser(authHeader);
+        User user = authService.getAuthenticatedUser(auth);
 
         // 2. Проверяем авторизацию
         if (user == null) {
@@ -61,26 +61,50 @@ public class MyController {
 
     // Баланс
     @GetMapping("/balance")
-    public BalanceResponse getBalance(@RequestHeader("Authorization") String authHeader) {
-        User user = authService.getAuthenticatedUser(authHeader);
+    public BalanceResponse getBalance(@RequestHeader("Authorization") String auth) {
+        User user = authService.getAuthenticatedUser(auth);
         if (user == null) {
             return BalanceResponse.builder().status("error").build();
         }
 
-        // 2. Получаем настроение бармена
-        String moodLevel = barService.getMoodLevel(user);
+        Bar bar = barService.getBarByUser(user);
 
         // 3. Формируем ответ
         BalanceResponse response = BalanceResponse.builder()
                 .status("ok")
                 .balance(user.getBalance())
-                .moodLevel(moodLevel)
+                .mood_level(bar.getMoodLevel())
                 .build();
 
         log.info("Пользователь {} запросил баланс: {}", user.getId(), user.getBalance());
 
         return response;
     }
+
+//     Профиль
+    @GetMapping("/profile")
+    public ProfileResponse getProfile(@RequestHeader("Authorization") String auth) {
+        User user = authService.getAuthenticatedUser(auth);
+        if (user == null) {
+            return ProfileResponse.builder().status("error").build();
+        }
+
+        Bar bar = barService.getBarByUser(user);
+
+        ProfileResponse response = ProfileResponse.builder()
+                .status("ok")
+                .id("BAR-" + user.getId())
+                .rank(user.getRang())
+                .total_orders(bar.getTotalOrders())
+                .unique_drinks(bar.getUniqueDrinksCount())
+                .favorite_drink(bar.getFavoriteDrink())
+                .bar_closed(bar.getBarClosed())
+                .build();
+
+        log.info("Пользователь {} запросил состояние бара", user.getId());
+        return response;
+    }
+
     // Меню
 //    @GetMapping("/menu")
 //    public MenuResponse getMenu(@RequestHeader("Authorization") String auth,
@@ -116,11 +140,5 @@ public class MyController {
 //    @GetMapping("/history")
 //    public HistoryResponse getHistory(@RequestHeader("Authorization") String auth) {
 //        return historyService.getHistory(auth);
-//    }
-
-    // Профиль
-//    @GetMapping("/profile")
-//    public ProfileResponse getProfile(@RequestHeader("Authorization") String auth) {
-//        return userService.getProfile(auth);
 //    }
 }

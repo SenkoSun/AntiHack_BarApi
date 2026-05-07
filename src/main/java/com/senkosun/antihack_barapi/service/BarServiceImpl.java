@@ -2,7 +2,6 @@ package com.senkosun.antihack_barapi.service;
 
 import com.senkosun.antihack_barapi.entity.Bar;
 import com.senkosun.antihack_barapi.entity.User;
-import com.senkosun.antihack_barapi.enums.Mood;
 import com.senkosun.antihack_barapi.repository.BarRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +22,6 @@ public class BarServiceImpl implements BarService{
     @Override
     public Bar Tip() {
         return null;
-    }
-
-    @Override
-    public String getMoodLevel(User user) {
-        Bar bar = getBarByUser(user);
-        return bar.getMoodLevel();
     }
 
     @Override

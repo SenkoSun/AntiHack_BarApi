@@ -1,6 +1,5 @@
 package com.senkosun.antihack_barapi.dto.response;
 
-import com.senkosun.antihack_barapi.enums.Drink;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
