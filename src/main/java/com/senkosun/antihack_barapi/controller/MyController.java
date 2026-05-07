@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 //import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 //import java.util.Map;
 
 
@@ -101,16 +103,30 @@ public class MyController {
                 .bar_closed(bar.getBarClosed())
                 .build();
 
-        log.info("Пользователь {} запросил состояние бара", user.getId());
+        log.info("Пользователь {} запросил профиль", user.getId());
         return response;
     }
 
     // Меню
-//    @GetMapping("/menu")
-//    public MenuResponse getMenu(@RequestHeader("Authorization") String auth,
-//                                @RequestHeader("X-Time") String time) {
-//        return barService.getMenu(auth, time);
-//    }
+    @GetMapping("/menu")
+    public MenuResponse getMenu(@RequestHeader("Authorization") String auth,
+                                @RequestHeader("X-Time") String time) {
+        User user = authService.getAuthenticatedUser(auth);
+        if (user == null) {
+            return MenuResponse.builder().status("error").build();
+        }
+        Bar bar = barService.getBarByUser(user);
+        List<MenuResponse.DrinkItem> drinks = barService.getDrinks();
+        MenuResponse response = MenuResponse.builder()
+                .status("ok")
+                .drinks(drinks)
+                .balance(user.getBalance())
+                .mood_level(bar.getMoodLevel())
+                .build();
+        log.info("Пользователь {} запросил меню", user.getId());
+        return response;
+
+    }
 
     // Заказ
 //    @PostMapping("/order")

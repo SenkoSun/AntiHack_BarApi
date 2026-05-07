@@ -15,7 +15,7 @@ public class MenuResponse {
     private String status;
     private List<DrinkItem> drinks;
     private Integer balance;
-    private String moodLevel;
+    private String mood_level;
 
     @Data
     @Builder
