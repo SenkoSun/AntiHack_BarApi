@@ -1,4 +1,5 @@
 package com.senkosun.antihack_barapi.controller;
+import com.senkosun.antihack_barapi.enums.Mood;
 import com.senkosun.antihack_barapi.service.*;
 //import com.senkosun.antihack_barapi.service.BarService;
 //import com.senkosun.antihack_barapi.service.HistoryService;
@@ -21,7 +22,7 @@ public class MyController {
 
     private final AuthService authService;
 
-//    private BarService barService;
+    private final BarService barService;
 //
 //    private final UserService userService;
 //
@@ -38,26 +39,48 @@ public class MyController {
                 .build();
     }
 
-//     Сброс
-@PostMapping("/reset")
-public ResetResponse reset(
-        @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    //     Сброс
+    @PostMapping("/reset")
+    public ResetResponse reset(
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-    // 1. Получаем пользователя по токену из заголовка
-    User user = authService.getAuthenticatedUser(authHeader);
+        // 1. Получаем пользователя по токену из заголовка
+        User user = authService.getAuthenticatedUser(authHeader);
 
-    // 2. Проверяем авторизацию
-    if (user == null) {
-        return ResetResponse.builder().status("error").build();
+        // 2. Проверяем авторизацию
+        if (user == null) {
+            return ResetResponse.builder().status("error").build();
+        }
+
+        // 3. Вызываем сброс
+        authService.resetUser(user);
+
+        // 4. Возвращаем ответ
+        return ResetResponse.builder().status("ok").build();
     }
 
-    // 3. Вызываем сброс
-    authService.resetUser(user);
+    // Баланс
+    @GetMapping("/balance")
+    public BalanceResponse getBalance(@RequestHeader("Authorization") String authHeader) {
+        User user = authService.getAuthenticatedUser(authHeader);
+        if (user == null) {
+            return BalanceResponse.builder().status("error").build();
+        }
 
-    // 4. Возвращаем ответ
-    return ResetResponse.builder().status("ok").build();
-}
+        // 2. Получаем настроение бармена
+        String moodLevel = barService.getMoodLevel(user);
 
+        // 3. Формируем ответ
+        BalanceResponse response = BalanceResponse.builder()
+                .status("ok")
+                .balance(user.getBalance())
+                .moodLevel(moodLevel)
+                .build();
+
+        log.info("Пользователь {} запросил баланс: {}", user.getId(), user.getBalance());
+
+        return response;
+    }
     // Меню
 //    @GetMapping("/menu")
 //    public MenuResponse getMenu(@RequestHeader("Authorization") String auth,
@@ -81,11 +104,6 @@ public ResetResponse reset(
 //        return barService.mix(auth, time, request);
 //    }
 
-    // Баланс
-//    @GetMapping("/balance")
-//    public BalanceResponse getBalance(@RequestHeader("Authorization") String auth) {
-//        return userService.getBalance(auth);
-//    }
 
     // Чаевые
 //    @PostMapping("/tip")
