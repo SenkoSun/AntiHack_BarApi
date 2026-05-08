@@ -270,8 +270,21 @@ public class MyController {
     }
 
     // История
-//    @GetMapping("/history")
-//    public HistoryResponse getHistory(@RequestHeader("Authorization") String auth) {
-//        return historyService.getHistory(auth);
-//    }
+    @GetMapping("/history")
+    public HistoryResponse getHistory(@RequestHeader("Authorization") String auth) {
+        User user = authService.getAuthenticatedUser(auth);
+        if (user == null) {
+            return HistoryResponse.builder().status("error").build();
+        }
+        Bar bar = barService.getBarByUser(user);
+        List<HistoryResponse.DrinkItem> drinks = barService.getDrinks();
+        HistoryResponse response = HistoryResponse.builder()
+                .status("ok")
+                .orders(drinks)
+                .balance(user.getBalance())
+                .mood_level(bar.getMoodLevel())
+                .build();
+        log.info("Пользователь {} запросил меню", user.getId());
+        return response;
+    }
 }

@@ -101,6 +101,11 @@ public class BarServiceImpl implements BarService{
                 .build();
 
         orderRepository.save(order);
+
+        bar.setTotalOrders(orderRepository.countByUserId(user.getId()));
+        bar.setUniqueDrinksCount(orderRepository.countUniqueDrinksByUserId(user.getId()));
+        bar.setFavoriteDrink(orderRepository.findFavoriteDrinkByUserId(user.getId()));
+
         barRepository.save(bar);
         userRepository.save(user);
 

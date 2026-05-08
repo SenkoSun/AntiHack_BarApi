@@ -30,7 +30,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     // Найти любимый напиток пользователя (самый частый)
     @Query(value = "SELECT drink_name FROM orders WHERE user_id = :userId " +
-            "GROUP BY drink_name ORDER BY COUNT(*) DESC LIMIT 1",
+            "GROUP BY drink_name HAVING COUNT(*) >= 3 ORDER BY COUNT(*) DESC LIMIT 1",
             nativeQuery = true)
     String findFavoriteDrinkByUserId(@Param("userId") Integer userId);
 }
