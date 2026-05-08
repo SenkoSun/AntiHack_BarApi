@@ -1,9 +1,11 @@
 package com.senkosun.antihack_barapi.controller;
+import com.senkosun.antihack_barapi.dto.request.MixRequest;
 import com.senkosun.antihack_barapi.dto.request.OrderRequest;
 import com.senkosun.antihack_barapi.dto.request.TipRequest;
 import com.senkosun.antihack_barapi.entity.Bar;
 import com.senkosun.antihack_barapi.entity.Order;
 import com.senkosun.antihack_barapi.enums.Drink;
+import com.senkosun.antihack_barapi.enums.Ingredient;
 import com.senkosun.antihack_barapi.service.*;
 //import com.senkosun.antihack_barapi.service.BarService;
 //import com.senkosun.antihack_barapi.service.HistoryService;
@@ -17,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 //import java.util.Map;
 
@@ -190,7 +194,7 @@ public class MyController {
             return OrderResponse.builder().status("error").build();
         }
 
-        Bar updatedBar = barService.makeOrder(user, drink);
+        Bar updatedBar = barService.makeOrder(user, drink, true);
 
         OrderResponse response = OrderResponse.builder()
                 .status("ok")
@@ -209,13 +213,61 @@ public class MyController {
 
 
     // Микс
-//    @PostMapping("/mix")
-//    public MixResponse mix(@RequestHeader("Authorization") String auth,
-//                           @RequestHeader("X-Time") String time,
-//                           @RequestBody MixRequest request) {
-//        return barService.mix(auth, time, request);
-//    }
+    @PostMapping("/mix")
+    public MixResponse mix(@RequestHeader("Authorization") String auth,
+                           @RequestHeader("X-Time") String time,
+                           @RequestBody MixRequest request) {
+        User user = authService.getAuthenticatedUser(auth);
 
+        //unauthorization
+        if (user == null) {
+            return MixResponse.builder().status("error").build();
+        }
+
+        Set<Ingredient> ingredients = request.getIngredients().stream()
+                .map(Ingredient::fromDisplayName)
+                .collect(Collectors.toSet());
+
+        //unknown_ingredients
+        if (ingredients.size() != request.getIngredients().size()) {
+            return MixResponse.builder().status("error").build();
+        }
+
+        Drink drink = findDrinkByIngredients(ingredients);
+
+        //unknown_drink
+        if (drink == null) {
+            return MixResponse.builder().status("error").build();
+        }
+
+        //insufficient_funds
+        if (user.getBalance() < drink.getPrice()) {
+            return MixResponse.builder().status("error").build();
+        }
+
+        Bar updatedBar = barService.makeOrder(user, drink, false);
+
+        MixResponse response = MixResponse.builder()
+                .status("ok")
+                .drink(drink.getDisplayName())
+                .price(drink.getPrice())
+                .balance(user.getBalance())
+                .mood_level(updatedBar.getMoodLevel())
+                .build();
+
+        log.info("Пользователь {} сделал микс {}", user.getId(), ingredients);
+
+        return  response;
+    }
+
+    private Drink findDrinkByIngredients(Set<Ingredient> ingredients) {
+        for (Drink drink : Drink.values()) {
+            if (drink.getIngredients().equals(ingredients)) {
+                return drink;
+            }
+        }
+        return null;
+    }
 
     // История
 //    @GetMapping("/history")
