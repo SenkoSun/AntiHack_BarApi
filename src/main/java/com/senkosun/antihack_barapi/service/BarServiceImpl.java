@@ -7,6 +7,7 @@ import com.senkosun.antihack_barapi.entity.User;
 import com.senkosun.antihack_barapi.enums.Drink;
 import com.senkosun.antihack_barapi.enums.Ingredient;
 import com.senkosun.antihack_barapi.enums.Mood;
+import com.senkosun.antihack_barapi.enums.Rank;
 import com.senkosun.antihack_barapi.repository.BarRepository;
 import com.senkosun.antihack_barapi.repository.OrderRepository;
 import com.senkosun.antihack_barapi.repository.UserRepository;
@@ -105,7 +106,7 @@ public class BarServiceImpl implements BarService{
         bar.setTotalOrders(orderRepository.countByUserId(user.getId()));
         bar.setUniqueDrinksCount(orderRepository.countUniqueDrinksByUserId(user.getId()));
         bar.setFavoriteDrink(orderRepository.findFavoriteDrinkByUserId(user.getId()));
-
+        user.setRang(Rank.getRankByUniqueDrinks(bar.getUniqueDrinksCount()).getDisplayName());
         barRepository.save(bar);
         userRepository.save(user);
 
