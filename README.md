@@ -1,21 +1,14 @@
-# 🍸 Black Bartender
+🍸 Black Bartender
 
-API for a mysterious bar where the bartender takes orders, mixes cocktails, keeps score, and remembers every customer.  
-The bartender has his own character, secret recipes, and special rules.
+Api for a mysterious bar where the bartender takes orders, mixes cocktails, keeps score, and remembers every customer. The bartender has his own character, secret recipes, and special rules.
 
----
+📝 Description
 
-## 📝 Description
+This project is an exact behavioral clone of the reference bar API. It supports user registration, ordering and mixing cocktails, a ranking system, bartender mood management, tips, and order history.
 
-This project is an exact behavioral clone of the reference bar API.  
-It supports user registration, ordering and mixing cocktails, a ranking system, bartender mood management, tips, and order history.
+The project was created for the antihack 2026 hackathon. The goal was to explore the reference API and implement an identical clone with all documented and hidden features.
 
-The project was created for the **AntiHack 2026** hackathon.  
-The goal was to explore the reference API and implement an identical clone with all documented and hidden features.
-
----
-
-## 🧰 Tech Stack
+🧰 Tech Stack
 
 - Java 21
 - Spring Boot 3.2
@@ -24,39 +17,42 @@ The goal was to explore the reference API and implement an identical clone with 
 - Lombok
 - Maven
 
----
+✨ Features
 
-## ✨ Features
+👤 Account
 
-### 👤 Account
-- `POST /register` – create a new user account
-- `POST /reset` – reset account to initial state
+- POST /register – create a new user account
+- POST /reset – reset account to initial state
 
-### 🍹 Orders
-- `GET /menu` – get cocktail menu (supports `X-Time` header)
-- `POST /order` – order a cocktail by name
-- `POST /mix` – create a cocktail by ingredients
+🍹 Orders
 
-### 💰 Balance & Statistics
-- `GET /balance` – check current balance
-- `POST /tip` – leave a tip (affects bartender's mood)
-- `GET /history` – view order history
-- `GET /profile` – view user profile (rank, statistics)
+- GET /menu – get cocktail menu (supports x-time header)
+- POST /order – order a cocktail by name
+- POST /mix – create a cocktail by ingredients
 
-### 📈 Ranking System
+💰 Balance & Statistic
+
+- GET /balance – check current balance
+- POST /tip – leave a tip (affects bartender's mood)
+- GET /history – view order history
+- GET /profile – view user profile (rank, statistics)
+
+📈 Ranking System
+
 Rank increases when tasting unique drinks:
 
-- 🍼 **BEGINNER** – Новичок
-- 🚪 **GUEST** – Гость
-- 🔁 **REGULAR** – Постоянный
-- 🧠 **CONNOISSEUR** – Знаток
-- 👑 **MASTER** – Мастер
+- Beginner
+- Quest
+- Regular
+- Connoisseur
+- Master
 
-### 🎭 Bartender's Mood
+🎭 Bartender's Mood
+
 Mood changes based on user actions:
 
-- 💢 **HOSTILE** – hostile
-- 😠 **GRUMPY** – grumpy
-- 😐 **NORMAL** – normal
-- 😊 **FRIENDLY** – friendly
-- 🎁 **GENEROUS** – generous
+- Hostile
+- Grumpy
+- Normal
+- Friendly
+- Generous
