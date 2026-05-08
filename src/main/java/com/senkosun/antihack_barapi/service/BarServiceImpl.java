@@ -86,13 +86,17 @@ public class BarServiceImpl implements BarService{
         } else {
             bar.moodInt = Math.max(bar.moodInt - 5, 0);
         }
+
+        int discount = 0;
+        if (!isOrder) discount += 2;
         bar.setMoodLevel(Mood.fromValue(bar.moodInt).getDisplayName());
-        user.setBalance(user.getBalance() - drink.getPrice());
+
+        user.setBalance(user.getBalance() - drink.getPrice() + discount);
 
         Order order = Order.builder()
                 .user(user)
                 .drinkName(drink.getDisplayName())
-                .price(drink.getPrice())
+                .price(drink.getPrice() - discount)
                 .method(isOrder?"order":"mix")
                 .build();
 
