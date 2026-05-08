@@ -128,6 +128,15 @@ public class MyController {
 
     }
 
+
+    // Чаевые
+//    @PostMapping("/tip")
+//    public TipResponse tip(@RequestHeader("Authorization") String auth,
+//                           @RequestBody TipRequest request) {
+//        return barService.tip(auth, request);
+//    }
+
+
     // Заказ
 //    @PostMapping("/order")
 //    public OrderResponse order(@RequestHeader("Authorization") String auth,
@@ -144,13 +153,6 @@ public class MyController {
 //        return barService.mix(auth, time, request);
 //    }
 
-
-    // Чаевые
-//    @PostMapping("/tip")
-//    public TipResponse tip(@RequestHeader("Authorization") String auth,
-//                           @RequestBody TipRequest request) {
-//        return barService.tip(auth, request);
-//    }
 
     // История
 //    @GetMapping("/history")
