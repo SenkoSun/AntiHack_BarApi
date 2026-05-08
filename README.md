@@ -10,8 +10,8 @@ The project was created for the AntiHack 2026 hackathon. The goal was to explore
 
 ## 🧰 Tech Stack
 
-- Java 21
-- Spring Boot 3.2
+- Java 25
+- Spring Boot
 - Spring Data JPA (Hibernate)
 - MySQL 8.0
 - Lombok
