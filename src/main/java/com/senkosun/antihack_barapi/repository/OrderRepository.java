@@ -24,6 +24,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     // Подсчитать количество заказов пользователя
     int countByUserId(Integer userId);
 
+
     // Подсчитать количество уникальных напитков пользователя
     @Query("SELECT COUNT(DISTINCT o.drinkName) FROM Order o WHERE o.user.id = :userId")
     int countUniqueDrinksByUserId(@Param("userId") Integer userId);

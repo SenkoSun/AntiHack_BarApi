@@ -36,7 +36,7 @@ public class MyController {
 //
 //    private final UserService userService;
 //
-//    private HistoryService historyService;
+    private final HistoryService historyService;
 
 //     Регистрация
     @PostMapping("/register")
@@ -277,14 +277,14 @@ public class MyController {
             return HistoryResponse.builder().status("error").build();
         }
         Bar bar = barService.getBarByUser(user);
-        List<HistoryResponse.DrinkItem> drinks = barService.getDrinks();
+        List<HistoryResponse.DrinkItem> drinks = historyService.getOrders(user);
         HistoryResponse response = HistoryResponse.builder()
                 .status("ok")
                 .orders(drinks)
                 .balance(user.getBalance())
                 .mood_level(bar.getMoodLevel())
                 .build();
-        log.info("Пользователь {} запросил меню", user.getId());
+        log.info("Пользователь {} запросил свою историю", user.getId());
         return response;
     }
 }
