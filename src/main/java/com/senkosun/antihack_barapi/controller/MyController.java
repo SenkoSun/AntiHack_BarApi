@@ -1,4 +1,5 @@
 package com.senkosun.antihack_barapi.controller;
+import com.senkosun.antihack_barapi.dto.request.TipRequest;
 import com.senkosun.antihack_barapi.entity.Bar;
 import com.senkosun.antihack_barapi.service.*;
 //import com.senkosun.antihack_barapi.service.BarService;
@@ -130,11 +131,35 @@ public class MyController {
 
 
     // Чаевые
-//    @PostMapping("/tip")
-//    public TipResponse tip(@RequestHeader("Authorization") String auth,
-//                           @RequestBody TipRequest request) {
-//        return barService.tip(auth, request);
-//    }
+    @PostMapping("/tip")
+    public TipResponse tip(@RequestHeader("Authorization") String auth,
+                           @RequestBody TipRequest request) {
+        User user = authService.getAuthenticatedUser(auth);
+        if (user == null) {
+            return TipResponse.builder().status("error").build();
+        }
+
+        int tipAmount = request.getAmount();
+        if (tipAmount <= 0) {
+            return TipResponse.builder().status("error").build();
+        }
+        if (user.getBalance() < tipAmount) {
+            return TipResponse.builder().status("error").build();
+        }
+
+        Bar updatedBar = barService.getTip(user, tipAmount);
+
+        TipResponse response = TipResponse.builder()
+                .status("ok")
+                .tip(tipAmount)
+                .balance(user.getBalance())
+                .mood_level(updatedBar.getMoodLevel())
+                .build();
+
+        log.info("Пользователь {} дал чаевые {}", user.getId(), tipAmount);
+
+        return response;
+    }
 
 
     // Заказ
