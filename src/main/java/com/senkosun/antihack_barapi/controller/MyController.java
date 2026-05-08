@@ -3,7 +3,7 @@ import com.senkosun.antihack_barapi.dto.request.MixRequest;
 import com.senkosun.antihack_barapi.dto.request.OrderRequest;
 import com.senkosun.antihack_barapi.dto.request.TipRequest;
 import com.senkosun.antihack_barapi.entity.Bar;
-import com.senkosun.antihack_barapi.entity.Order;
+//import com.senkosun.antihack_barapi.entity.Order;
 import com.senkosun.antihack_barapi.enums.Drink;
 import com.senkosun.antihack_barapi.enums.Ingredient;
 import com.senkosun.antihack_barapi.service.*;
@@ -59,7 +59,7 @@ public class MyController {
 
         // 2. Проверяем авторизацию
         if (user == null) {
-            return ResetResponse.builder().status("error").build();
+            return ResetResponse.builder().status("error").error("un_authorization").build();
         }
 
         // 3. Вызываем сброс
@@ -74,7 +74,7 @@ public class MyController {
     public BalanceResponse getBalance(@RequestHeader("Authorization") String auth) {
         User user = authService.getAuthenticatedUser(auth);
         if (user == null) {
-            return BalanceResponse.builder().status("error").build();
+            return BalanceResponse.builder().status("error").error("un_authorization").build();
         }
 
         Bar bar = barService.getBarByUser(user);
@@ -96,7 +96,7 @@ public class MyController {
     public ProfileResponse getProfile(@RequestHeader("Authorization") String auth) {
         User user = authService.getAuthenticatedUser(auth);
         if (user == null) {
-            return ProfileResponse.builder().status("error").build();
+            return ProfileResponse.builder().status("error").error("un_authorization").build();
         }
 
         Bar bar = barService.getBarByUser(user);
@@ -121,7 +121,7 @@ public class MyController {
                                 @RequestHeader("X-Time") String time) {
         User user = authService.getAuthenticatedUser(auth);
         if (user == null) {
-            return MenuResponse.builder().status("error").build();
+            return MenuResponse.builder().status("error").error("un_authorization").build();
         }
         Bar bar = barService.getBarByUser(user);
         List<MenuResponse.DrinkItem> drinks = barService.getDrinks();
@@ -142,16 +142,17 @@ public class MyController {
     public TipResponse tip(@RequestHeader("Authorization") String auth,
                            @RequestBody TipRequest request) {
         User user = authService.getAuthenticatedUser(auth);
+        Bar bar = barService.getBarByUser(user);
         if (user == null) {
-            return TipResponse.builder().status("error").build();
+            return TipResponse.builder().status("error").error("un_authorization").build();
         }
 
         int tipAmount = request.getAmount();
         if (tipAmount <= 0) {
-            return TipResponse.builder().status("error").build();
+            return TipResponse.builder().status("error").error("uncorrect_value").balance(user.getBalance()).mood_level(bar.getMoodLevel()).build();
         }
         if (user.getBalance() < tipAmount) {
-            return TipResponse.builder().status("error").build();
+            return TipResponse.builder().status("error").error("insufficient_funds").balance(user.getBalance()).mood_level(bar.getMoodLevel()).build();
         }
 
         Bar updatedBar = barService.getTip(user, tipAmount);
@@ -175,10 +176,11 @@ public class MyController {
                                @RequestHeader("X-Time") String time,
                                @RequestBody OrderRequest request) {
         User user = authService.getAuthenticatedUser(auth);
-
-        //unauthorization
+        Bar bar = barService.getBarByUser(user);
+        
+        //un_authorization
         if (user == null) {
-            return OrderResponse.builder().status("error").build();
+            return OrderResponse.builder().status("error").error("un_authorization").build();
         }
 
         String nameDrink = request.getName();
@@ -186,12 +188,12 @@ public class MyController {
 
         //unknown_drink
         if (drink == null) {
-            return OrderResponse.builder().status("error").build();
+            return OrderResponse.builder().status("error").error("unknown_drink").balance(user.getBalance()).mood_level(bar.getMoodLevel()).build();
         }
 
         //insufficient_funds
         if (user.getBalance() < drink.getPrice()) {
-            return OrderResponse.builder().status("error").build();
+            return OrderResponse.builder().status("error").error("insufficient_funds").price(drink.getPrice()).balance(user.getBalance()).mood_level(bar.getMoodLevel()).build();
         }
 
         Bar updatedBar = barService.makeOrder(user, drink, true);
@@ -218,10 +220,10 @@ public class MyController {
                            @RequestHeader("X-Time") String time,
                            @RequestBody MixRequest request) {
         User user = authService.getAuthenticatedUser(auth);
-
-        //unauthorization
+        Bar bar = barService.getBarByUser(user);
+        //un_authorization
         if (user == null) {
-            return MixResponse.builder().status("error").build();
+            return MixResponse.builder().status("error").error("un_authorization").build();
         }
 
         Set<Ingredient> ingredients = request.getIngredients().stream()
@@ -230,19 +232,19 @@ public class MyController {
 
         //unknown_ingredients
         if (ingredients.size() != request.getIngredients().size()) {
-            return MixResponse.builder().status("error").build();
+            return MixResponse.builder().status("error").error("unknown_ingredients").balance(user.getBalance()).mood_level(bar.getMoodLevel()).build();
         }
 
         Drink drink = findDrinkByIngredients(ingredients);
 
         //unknown_drink
         if (drink == null) {
-            return MixResponse.builder().status("error").build();
+            return MixResponse.builder().status("error").error("unknown_recipe").balance(user.getBalance()).mood_level(bar.getMoodLevel()).build();
         }
 
         //insufficient_funds
         if (user.getBalance() < drink.getPrice()) {
-            return MixResponse.builder().status("error").build();
+            return MixResponse.builder().status("error").error("insufficient_funds").price(drink.getPrice()).balance(user.getBalance()).mood_level(bar.getMoodLevel()).build();
         }
 
         Bar updatedBar = barService.makeOrder(user, drink, false);
@@ -274,7 +276,7 @@ public class MyController {
     public HistoryResponse getHistory(@RequestHeader("Authorization") String auth) {
         User user = authService.getAuthenticatedUser(auth);
         if (user == null) {
-            return HistoryResponse.builder().status("error").build();
+            return HistoryResponse.builder().status("error").error("un_authorization").build();
         }
         Bar bar = barService.getBarByUser(user);
         List<HistoryResponse.DrinkItem> drinks = historyService.getOrders(user);

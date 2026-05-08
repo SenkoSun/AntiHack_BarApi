@@ -1,5 +1,6 @@
 package com.senkosun.antihack_barapi.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +10,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderResponse {
     private String status;
+
+    private String error;
+
     private String drink;
     private Integer price;
     private Integer balance;
