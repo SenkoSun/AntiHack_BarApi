@@ -1,6 +1,9 @@
 package com.senkosun.antihack_barapi.controller;
+import com.senkosun.antihack_barapi.dto.request.OrderRequest;
 import com.senkosun.antihack_barapi.dto.request.TipRequest;
 import com.senkosun.antihack_barapi.entity.Bar;
+import com.senkosun.antihack_barapi.entity.Order;
+import com.senkosun.antihack_barapi.enums.Drink;
 import com.senkosun.antihack_barapi.service.*;
 //import com.senkosun.antihack_barapi.service.BarService;
 //import com.senkosun.antihack_barapi.service.HistoryService;
@@ -162,13 +165,48 @@ public class MyController {
     }
 
 
-    // Заказ
-//    @PostMapping("/order")
-//    public OrderResponse order(@RequestHeader("Authorization") String auth,
-//                               @RequestHeader("X-Time") String time,
-//                               @RequestBody OrderRequest request) {
-//        return barService.order(auth, time, request);
-//    }
+//     Заказ
+    @PostMapping("/order")
+    public OrderResponse order(@RequestHeader("Authorization") String auth,
+                               @RequestHeader("X-Time") String time,
+                               @RequestBody OrderRequest request) {
+        User user = authService.getAuthenticatedUser(auth);
+
+        //unauthorization
+        if (user == null) {
+            return OrderResponse.builder().status("error").build();
+        }
+
+        String nameDrink = request.getName();
+        Drink drink = Drink.fromDisplayName(nameDrink);
+
+        //unknown_drink
+        if (drink == null) {
+            return OrderResponse.builder().status("error").build();
+        }
+
+        //insufficient_funds
+        if (user.getBalance() < drink.getPrice()) {
+            return OrderResponse.builder().status("error").build();
+        }
+
+        Bar updatedBar = barService.makeOrder(user, drink);
+
+        OrderResponse response = OrderResponse.builder()
+                .status("ok")
+                .drink(nameDrink)
+                .price(drink.getPrice())
+                .balance(user.getBalance())
+                .mood_level(updatedBar.getMoodLevel())
+                .build();
+
+        log.info("Пользователь {} сделал заказ {}", user.getId(), nameDrink);
+
+        return  response;
+
+
+    }
+
 
     // Микс
 //    @PostMapping("/mix")

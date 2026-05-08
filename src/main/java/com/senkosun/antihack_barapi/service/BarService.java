@@ -15,4 +15,5 @@ public interface BarService {
     List<MenuResponse.DrinkItem> getDrinks();
     MenuResponse.DrinkItem toDrinkItem(Drink drink);
     Bar getTip(User user, Integer tip);
+    Bar makeOrder(User user, Drink drink);
 }
