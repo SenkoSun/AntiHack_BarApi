@@ -42,6 +42,7 @@ public class Bar {
     @Column(name = "favorite_drink")
     private String favoriteDrink;
 
+    public int moodInt = 60;
     // Методы для обновления статистики
     public void incrementTotalOrders() {
         this.totalOrders++;

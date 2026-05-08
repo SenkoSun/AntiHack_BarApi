@@ -60,6 +60,7 @@ public class AuthServiceImpl implements AuthService{
                 .orElseThrow(() -> new RuntimeException("Бар не найден для пользователя id=" + user.getId()));
 
         bar.setMoodLevel(Mood.NORMAL.getDisplayName());
+        bar.setMoodInt(60);
         bar.setBarClosed(false);
         bar.setTotalOrders(0);
         bar.setUniqueDrinksCount(0);

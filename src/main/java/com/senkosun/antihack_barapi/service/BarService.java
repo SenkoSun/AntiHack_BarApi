@@ -14,4 +14,5 @@ public interface BarService {
     Bar getBarByUser(User user);
     List<MenuResponse.DrinkItem> getDrinks();
     MenuResponse.DrinkItem toDrinkItem(Drink drink);
+    Bar getTip(User user, Integer tip);
 }

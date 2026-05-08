@@ -5,7 +5,9 @@ import com.senkosun.antihack_barapi.entity.Bar;
 import com.senkosun.antihack_barapi.entity.User;
 import com.senkosun.antihack_barapi.enums.Drink;
 import com.senkosun.antihack_barapi.enums.Ingredient;
+import com.senkosun.antihack_barapi.enums.Mood;
 import com.senkosun.antihack_barapi.repository.BarRepository;
+import com.senkosun.antihack_barapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class BarServiceImpl implements BarService{
 
     private final BarRepository barRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Bar Menu() {
@@ -56,4 +59,18 @@ public class BarServiceImpl implements BarService{
                 )
                 .build();
     }
+
+    @Override
+    public Bar getTip(User user, Integer tip) {
+        Bar bar = getBarByUser(user);
+        bar.moodInt = Math.min(bar.moodInt + tip, 100);
+        bar.setMoodLevel(Mood.fromValue(bar.moodInt).getDisplayName());
+        user.setBalance(user.getBalance() - tip);
+
+        barRepository.save(bar);
+        userRepository.save(user);
+
+        return bar;
+    }
+
 }
