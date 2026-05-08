@@ -77,7 +77,7 @@ public class BarServiceImpl implements BarService{
     }
 
     @Override
-    public Bar makeOrder(User user, Drink drink) {
+    public Bar makeOrder(User user, Drink drink, Boolean isOrder) {
         Bar bar = getBarByUser(user);
         if (drink.getDisplayName().equals("Лонг-Айленд")) {
             bar.moodInt = Math.min(bar.moodInt + 10, 100);
@@ -93,7 +93,7 @@ public class BarServiceImpl implements BarService{
                 .user(user)
                 .drinkName(drink.getDisplayName())
                 .price(drink.getPrice())
-                .method("order")
+                .method(isOrder?"order":"mix")
                 .build();
 
         orderRepository.save(order);
