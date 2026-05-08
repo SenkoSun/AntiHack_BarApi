@@ -2,11 +2,13 @@ package com.senkosun.antihack_barapi.service;
 
 import com.senkosun.antihack_barapi.dto.response.MenuResponse;
 import com.senkosun.antihack_barapi.entity.Bar;
+import com.senkosun.antihack_barapi.entity.Order;
 import com.senkosun.antihack_barapi.entity.User;
 import com.senkosun.antihack_barapi.enums.Drink;
 import com.senkosun.antihack_barapi.enums.Ingredient;
 import com.senkosun.antihack_barapi.enums.Mood;
 import com.senkosun.antihack_barapi.repository.BarRepository;
+import com.senkosun.antihack_barapi.repository.OrderRepository;
 import com.senkosun.antihack_barapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ public class BarServiceImpl implements BarService{
 
     private final BarRepository barRepository;
     private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
 
     @Override
     public Bar Menu() {
@@ -67,6 +70,33 @@ public class BarServiceImpl implements BarService{
         bar.setMoodLevel(Mood.fromValue(bar.moodInt).getDisplayName());
         user.setBalance(user.getBalance() - tip);
 
+        barRepository.save(bar);
+        userRepository.save(user);
+
+        return bar;
+    }
+
+    @Override
+    public Bar makeOrder(User user, Drink drink) {
+        Bar bar = getBarByUser(user);
+        if (drink.getDisplayName().equals("Лонг-Айленд")) {
+            bar.moodInt = Math.min(bar.moodInt + 10, 100);
+        } else if (drink.getDisplayName().equals("Русский")) {
+            bar.moodInt = Math.max(bar.moodInt - 10, 0);
+        } else {
+            bar.moodInt = Math.max(bar.moodInt - 5, 0);
+        }
+        bar.setMoodLevel(Mood.fromValue(bar.moodInt).getDisplayName());
+        user.setBalance(user.getBalance() - drink.getPrice());
+
+        Order order = Order.builder()
+                .user(user)
+                .drinkName(drink.getDisplayName())
+                .price(drink.getPrice())
+                .method("order")
+                .build();
+
+        orderRepository.save(order);
         barRepository.save(bar);
         userRepository.save(user);
 
