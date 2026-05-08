@@ -6,6 +6,7 @@ import com.senkosun.antihack_barapi.enums.Mood;
 import com.senkosun.antihack_barapi.enums.Rank;
 import com.senkosun.antihack_barapi.repository.BarRepository;
 import com.senkosun.antihack_barapi.repository.UserRepository;
+import com.senkosun.antihack_barapi.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class AuthServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
     private final BarRepository barRepository;
+    private final OrderRepository orderRepository;
 
     @Transactional
     @Override
@@ -66,6 +68,8 @@ public class AuthServiceImpl implements AuthService{
         bar.setUniqueDrinksCount(0);
         bar.setFavoriteDrink(null);
         barRepository.save(bar);
+
+        orderRepository.deleteByUser(user);
 
         log.info("Пользователь {} сбросил аккаунт", user.getId());
 

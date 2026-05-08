@@ -12,6 +12,11 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
+    void deleteByUser(User user);
+
+    // Или удалить по ID пользователя
+    void deleteByUserId(Integer userId);
+
     // Найти все заказы пользователя (по пользователю)
     List<Order> findByUser(User user);
 
