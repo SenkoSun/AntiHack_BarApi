@@ -16,6 +16,7 @@ The project was created for the AntiHack 2026 hackathon. The goal was to explore
 - MySQL 8.0
 - Lombok
 - Maven
+- JUnit
 
 ## ✨ Features
 
